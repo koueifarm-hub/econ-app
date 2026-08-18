@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="経済学用語">
+<meta name="theme-color" content="#0f172a">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230f172a'/%3E%3Ctext x='50' y='65' font-size='55' text-anchor='middle' fill='%2338bdf8'%3E%F0%9F%93%98%3C/text%3E%3C/svg%3E">
+<title>経済学用語 学習アプリ</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#1e293b; --accent:#38bdf8; --text:#e2e8f0; --muted:#94a3b8;
+    --ng:#f87171; --mid:#fbbf24; --ok:#4ade80;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Hiragino Sans","Yu Gothic",sans-serif;
+    background:linear-gradient(160deg,#0f172a,#1e2a44);
+    color:var(--text); min-height:100vh;
+    padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px);
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+  h1{font-size:1.3rem;text-align:center;margin:8px 0 16px;}
+  .stats{
+    display:flex; gap:8px; justify-content:center; margin-bottom:14px; flex-wrap:wrap;
+  }
+  .stat{
+    background:var(--card); border-radius:10px; padding:6px 12px; font-size:0.8rem;
+    display:flex; gap:6px; align-items:center;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;}
+  select{
+    background:var(--card); color:var(--text); border:1px solid #334155; border-radius:8px;
+    padding:6px 10px; font-size:0.85rem; margin:2px;
+  }
+  .controls{display:flex; gap:8px; justify-content:center; margin-bottom:12px; flex-wrap:wrap;}
+  .progressbar{
+    height:6px; background:#334155; border-radius:3px; overflow:hidden; margin-bottom:16px;
+  }
+  .progressfill{height:100%; background:var(--accent); transition:width .3s;}
+  .card{
+    background:var(--card); border-radius:18px; padding:28px 22px; min-height:220px;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    text-align:center; box-shadow:0 8px 24px rgba(0,0,0,.35); cursor:pointer;
+    position:relative; user-select:none;
+  }
+  .cat{
+    position:absolute; top:12px; left:14px; font-size:0.7rem; color:var(--muted);
+    background:#0f172a; padding:3px 9px; border-radius:999px;
+  }
+  .term{font-size:1.6rem; font-weight:700; margin-bottom:6px;}
+  .hint{color:var(--muted); font-size:0.8rem; margin-top:10px;}
+  .desc{font-size:1rem; line-height:1.6; margin-top:8px;}
+  .formula{
+    margin-top:14px; font-family:monospace; font-size:1rem; color:var(--accent);
+    background:#0f172a; padding:8px 14px; border-radius:8px;
+  }
+  .rate-row{display:flex; gap:10px; margin-top:18px;}
+  .rate-btn{
+    flex:1; padding:12px 6px; border:none; border-radius:12px; font-size:0.85rem;
+    font-weight:600; cursor:pointer; color:#0f172a;
+  }
+  .rate-ng{background:var(--ng);}
+  .rate-mid{background:var(--mid);}
+  .rate-ok{background:var(--ok);}
+  .navrow{display:flex; gap:10px; margin-top:14px;}
+  .navbtn{
+    flex:1; padding:10px; border-radius:10px; border:1px solid #334155; background:transparent;
+    color:var(--text); cursor:pointer; font-size:0.85rem;
+  }
+  .navbtn:active{background:#334155;}
+  .footer{text-align:center; color:var(--muted); font-size:0.75rem; margin-top:16px;}
+  .badge{
+    position:absolute; top:12px; right:14px; font-size:0.7rem; padding:3px 9px; border-radius:999px;
+  }
+  .b-ng{background:rgba(248,113,113,.2); color:var(--ng);}
+  .b-mid{background:rgba(251,191,36,.2); color:var(--mid);}
+  .b-ok{background:rgba(74,222,128,.2); color:var(--ok);}
+  .b-new{background:#334155; color:var(--muted);}
+  .loading{text-align:center; margin-top:60px; color:var(--muted);}
+  .tabs{display:flex; gap:8px; justify-content:center; margin-bottom:14px;}
+  .tabbtn{
+    background:var(--card); color:var(--muted); border:1px solid #334155; border-radius:999px;
+    padding:6px 16px; font-size:0.85rem; cursor:pointer;
+  }
+  .tabbtn.active{background:var(--accent); color:#0f172a; border-color:var(--accent); font-weight:700;}
+  .synctag{font-size:0.7rem; padding:2px 8px; border-radius:999px; margin-left:6px;}
+  .sync-ok{background:rgba(74,222,128,.2); color:var(--ok);}
+  .sync-off{background:rgba(148,163,184,.2); color:var(--muted);}
+  table.hist{width:100%; border-collapse:collapse; font-size:0.8rem;}
+  table.hist th, table.hist td{padding:6px 8px; border-bottom:1px solid #334155; text-align:left;}
+  table.hist th{color:var(--muted); font-weight:600;}
+  .histwrap{background:var(--card); border-radius:14px; padding:12px; max-height:520px; overflow:auto;}
+  .lvpill{padding:2px 8px; border-radius:999px; font-size:0.75rem; font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📘 経済学用語 学習アプリ</h1>
+  <div id="app" class="loading">読み込み中...</div>
+</div>
+
+<script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbza7bFXPZF_NN9vIQl8aRDy-GjIKEO2poyOZinQGk0Oj7sQp5rmPTSifQ5qT8jFLjcq/exec";
+
+const TERMS = [
+["基礎","希少性","人間の欲望に対して資源には限りがあること",""],
+["基礎","機会費用","ある選択をしたことで諦めた、最も価値の高い選択肢",""],
+["基礎","限界","もう1単位増やしたときに生じる追加的な変化",""],
+["消費者","TU","総効用（Total Utility）。消費から得られる満足度の合計",""],
+["消費者","MU","限界効用（Marginal Utility）。1単位追加消費したときの効用の増加","MU＝ΔTU/ΔQ"],
+["消費者","限界効用逓減","消費量が増えるほど、追加的な満足度が低下する",""],
+["需要","需要","消費者が購入したい数量",""],
+["需要","供給","生産者が販売したい数量",""],
+["需要","需要曲線","価格と需要量の関係を示す曲線",""],
+["供給","供給曲線","価格と供給量の関係を示す曲線",""],
+["市場","市場均衡","需要量と供給量が一致する状態","Qd＝Qs"],
+["市場","均衡価格","需要量と供給量を一致させる価格",""],
+["市場","均衡取引量","均衡状態で取引される数量",""],
+["市場","超過需要","需要量が供給量を上回る状態","Qd＞Qs"],
+["市場","超過供給","供給量が需要量を上回る状態","Qs＞Qd"],
+["弾力性","Ed","需要の価格弾力性（Price Elasticity of Demand）。価格変化に対する需要量の反応度","Ed＝−(ΔQ/Q)/(ΔP/P)"],
+["弾力性","Es","供給の価格弾力性（Price Elasticity of Supply）。価格変化に対する供給量の反応度","Es＝(ΔQ/Q)/(ΔP/P)"],
+["弾力性","Ey","需要の所得弾力性（Income Elasticity of Demand）。所得変化に対する需要量の反応度","Ey＝(ΔQ/Q)/(ΔY/Y)"],
+["弾力性","Exy","交差価格弾力性（Cross Price Elasticity）。他財の価格変化に対する自財需要の反応度","Exy＝(ΔQx/Qx)/(ΔPy/Py)"],
+["財","正常財","所得が増えると需要が増える財",""],
+["財","上級財","所得の増加率以上に需要が増える財","Ey＞1"],
+["財","下級財","所得が増えると需要が減少する財","Ey＜0"],
+["財","代替財","コーヒーと紅茶のように、互いに代わりになる財",""],
+["財","補完財","自動車とガソリンのように、一緒に使う財",""],
+["消費者","予算制約線","消費者が所得の範囲内で購入できる財の組み合わせ","PxX＋PyY＝I"],
+["消費者","無差別曲線","消費者にとって同じ効用になる財の組み合わせ",""],
+["消費者","MRS","限界代替率（Marginal Rate of Substitution）。同じ効用を維持するために交換できる財の割合","MRS＝MUx/MUy"],
+["消費者","代替効果","相対価格の変化によって、相対的に安くなった財へ消費を移す効果",""],
+["消費者","所得効果","価格変化による実質購買力の変化が消費に与える効果",""],
+["消費者","効用最大化","予算制約の中で消費者の満足度を最大化すること","MUx/Px＝MUy/Py"],
+["生産者","生産関数","労働・資本などの投入量と生産量の関係","Q＝f(L,K)"],
+["生産者","生産要素","生産に必要な労働・資本・土地など",""],
+["生産者","AP","平均生産物（Average Product）。生産要素1単位当たりの生産量","AP＝Q/L"],
+["生産者","MP","限界生産物（Marginal Product）。生産要素を1単位追加したときの生産量増加","MP＝ΔQ/ΔL"],
+["費用","FC","固定費（Fixed Cost）。生産量にかかわらず発生する費用",""],
+["費用","VC","可変費（Variable Cost）。生産量に応じて変化する費用",""],
+["費用","TC","総費用（Total Cost）。固定費＋可変費","TC＝FC＋VC"],
+["費用","AC","平均費用（Average Cost）。1単位当たりの総費用","AC＝TC/Q"],
+["費用","AFC","平均固定費用（Average Fixed Cost）。1単位当たりの固定費","AFC＝FC/Q"],
+["費用","AVC","平均可変費用（Average Variable Cost）。1単位当たりの可変費","AVC＝VC/Q"],
+["費用","MC","限界費用（Marginal Cost）。生産量を1単位増やしたときの追加費用","MC＝ΔTC/ΔQ"],
+["収入","TR","総収入（Total Revenue）。商品の販売による収入の合計","TR＝P×Q"],
+["収入","AR","平均収入（Average Revenue）。1単位当たりの収入","AR＝TR/Q"],
+["収入","MR","限界収入（Marginal Revenue）。1単位追加販売したときの収入増加","MR＝ΔTR/ΔQ"],
+["利潤","π","利潤（Profit）。総収入から総費用を差し引いたもの","π＝TR−TC"],
+["利潤","利潤最大化","企業が利益を最大にする生産量を決定すること","MR＝MC"],
+["市場","完全競争市場","多数の企業・消費者が存在し、企業が価格を決められない市場","P＝AR＝MR"],
+["市場","プライステイカー","市場で決まった価格を受け入れる企業",""],
+["市場","独占","供給者が1社しか存在しない市場",""],
+["市場","独占価格","独占企業が利潤最大化によって設定する価格","MR＝MC"],
+["市場","独占利潤","独占企業が得る利潤","π＝TR−TC"],
+["市場","寡占","少数の企業が市場を支配する状態",""],
+["市場","クールノー競争","企業が生産量を戦略として競争するモデル",""],
+["市場","ベルトラン競争","企業が価格を戦略として競争するモデル",""],
+["ゲーム理論","戦略","プレイヤーが選択する行動",""],
+["ゲーム理論","利得","戦略の結果として得られる利益",""],
+["ゲーム理論","支配戦略","相手がどの戦略を選んでも最適となる戦略",""],
+["ゲーム理論","ナッシュ均衡","相手の戦略を前提とすると、自分だけ戦略を変えても得しない状態",""],
+["ゲーム理論","囚人のジレンマ","個人にとって合理的な行動が全体では非効率になる状況",""],
+["ゲーム理論","パレート最適","誰かをより良くすると必ず誰かが悪くなる状態",""],
+["余剰","CS","消費者余剰（Consumer Surplus）。支払ってもよい金額と実際の支払額との差","CS＝1/2×底辺×高さ"],
+["余剰","PS","生産者余剰（Producer Surplus）。販売価格と最低供給価格との差","PS＝1/2×底辺×高さ"],
+["余剰","TS","総余剰（Total Surplus）。消費者余剰＋生産者余剰","TS＝CS＋PS"],
+["余剰","死荷重","市場の歪みによって失われる社会的余剰","DWL＝最大余剰−実際の余剰"],
+["市場失敗","市場の失敗","市場メカニズムだけでは効率的な資源配分ができない状態",""],
+["外部性","外部性","経済活動が第三者に与える影響",""],
+["外部性","外部経済","第三者にプラスの影響を与えること",""],
+["外部性","外部不経済","第三者にマイナスの影響を与えること",""],
+["外部性","PMC","私的限界費用（Private Marginal Cost）。生産者自身が負担する追加費用",""],
+["外部性","SMC","社会的限界費用（Social Marginal Cost）。私的限界費用＋外部限界費用","SMC＝PMC＋EMC"],
+["外部性","PMB","私的限界便益（Private Marginal Benefit）。本人が得る追加的便益",""],
+["外部性","SMB","社会的限界便益（Social Marginal Benefit）。私的便益＋外部便益","SMB＝PMB＋EMB"],
+["政策","ピグー税","外部不経済を発生させる活動に課税する政策","税＝外部費用"],
+["政策","補助金","外部経済などを生み出す活動を促進する政策","補助金＝外部便益"],
+["政策","従量税","財1単位につき一定額を課税","税収＝t×Q"],
+["政策","従価税","財の価格に一定割合を課税","税＝P×税率"],
+["国際","絶対優位","同じ資源でより多く生産できる能力",""],
+["国際","比較優位","機会費用が相対的に小さいこと","機会費用＝犠牲にした財/得られる財"],
+["国際","自由貿易","貿易制限をできるだけなくすこと",""],
+["国際","関税","輸入品に課される税金","関税収入＝関税×輸入量"],
+["国際","輸入割当","輸入できる数量を制限する政策",""],
+["国際","貿易収支","輸出と輸入の差","NX＝X−M"],
+["国際","貿易黒字","輸出が輸入を上回る状態","X＞M"],
+["国際","貿易赤字","輸入が輸出を上回る状態","X＜M"],
+["マクロ","GDP","国内総生産（Gross Domestic Product）。国内で生み出された付加価値の合計","GDP＝C＋I＋G＋NX"],
+["マクロ","名目GDP","その時点の市場価格で計算したGDP",""],
+["マクロ","実質GDP","物価変動の影響を取り除いたGDP",""],
+["マクロ","GDPデフレーター","GDP全体の物価水準を表す指標","名目GDP/実質GDP×100"],
+["マクロ","付加価値","生産によって新たに生み出された価値","売上−中間投入"],
+["マクロ","三面等価","生産・分配・支出のGDPは等しい","生産＝分配＝支出"],
+["45度線","有効需要","実際に支出される需要",""],
+["45度線","消費関数","所得と消費の関係","C＝C₀＋cY"],
+["45度線","投資","設備・在庫などへの支出",""],
+["45度線","政府支出","政府による財・サービスへの支出",""],
+["45度線","MPC","限界消費性向（Marginal Propensity to Consume）。所得増加分のうち消費に回す割合","MPC＝ΔC/ΔY"],
+["45度線","MPS","限界貯蓄性向（Marginal Propensity to Save）。所得増加分のうち貯蓄に回す割合","MPS＝ΔS/ΔY"],
+["45度線","APC","平均消費性向（Average Propensity to Consume）。所得のうち消費する割合","APC＝C/Y"],
+["45度線","APS","平均貯蓄性向（Average Propensity to Save）。所得のうち貯蓄する割合","APS＝S/Y"],
+["乗数","乗数効果","支出の変化がGDPに何倍もの変化をもたらす効果",""],
+["乗数","政府支出乗数","政府支出の変化がGDPに与える効果","k＝1/(1−MPC)"],
+["乗数","貯蓄乗数","MPC・MPSを利用した乗数","k＝1/MPS"],
+["乗数","租税乗数","税の変化がGDPに与える効果","kt＝−MPC/(1−MPC)"],
+["乗数","均衡予算乗数","政府支出と税を同額変化させた効果","k＝1"],
+["金融","貨幣","交換手段・価値尺度・価値保存の機能を持つもの",""],
+["金融","貨幣需要","人々が貨幣を保有したい量",""],
+["金融","貨幣供給","経済に供給される貨幣の量",""],
+["金融","マネーストック","経済全体に存在する貨幣量",""],
+["金融","マネタリーベース","中央銀行が供給する現金＋中央銀行当座預金",""],
+["金融","信用創造","銀行の貸出によって預金通貨が生み出される仕組み","預金総額＝最初の預金×1/r"],
+["金融","預金準備率","銀行が預金のうち準備として保有する割合","r＝準備預金/預金"],
+["金融","貨幣乗数","マネタリーベースが何倍の貨幣になるか","m＝1/r"],
+["金融","貨幣の流通速度","貨幣が一定期間に平均何回使われるか","V＝PY/M"],
+["金融","貨幣数量方程式","貨幣量と物価・取引量の関係","MV＝PY"],
+["IS-LM","IS曲線","Investment-Saving Curve（投資・貯蓄曲線）。財市場を均衡させる所得と利子率の組み合わせ","Y＝C＋I＋G＋NX"],
+["IS-LM","LM曲線","Liquidity preference-Money supply Curve（流動性選好・貨幣供給曲線）。貨幣市場を均衡させる所得と利子率の組み合わせ","M/P＝L(Y,r)"],
+["IS-LM","利子率","お金を借りるときの価格",""],
+["IS-LM","流動性選好","人々が貨幣を手元に保有したいという欲求",""],
+["IS-LM","クラウディングアウト","政府支出増加などによる利子率上昇で民間投資が減少すること","G↑→r↑→I↓"],
+["政策","財政政策","政府支出や税を使って経済を調整する政策",""],
+["政策","金融政策","中央銀行が金利・貨幣供給などを使って経済を調整する政策",""],
+["物価","インフレーション","物価が継続的に上昇すること","インフレ率＝物価上昇率"],
+["物価","デフレーション","物価が継続的に下落すること",""],
+["物価","需要インフレ","需要の増加によって物価が上昇すること",""],
+["物価","コストプッシュ・インフレ","原材料費・賃金などの上昇による物価上昇",""],
+["物価","ディスインフレ","インフレ率が低下すること",""],
+["金融","名目金利","表面的に表示されている金利",""],
+["金融","実質金利","物価上昇率を考慮した実質的な金利","実質金利≒名目金利−期待インフレ率"],
+["雇用","完全失業率","労働力人口に占める完全失業者の割合","失業者/労働力人口×100"],
+["雇用","労働力人口","就業者＋完全失業者","労働力人口＝就業者＋失業者"],
+["雇用","労働力率","15歳以上人口に占める労働力人口の割合","労働力人口/15歳以上人口×100"],
+["雇用","摩擦的失業","転職・就職活動などによる一時的失業",""],
+["雇用","構造的失業","技能・地域などのミスマッチによる失業",""],
+["雇用","需要不足失業","景気悪化による需要不足から生じる失業",""],
+["雇用","自然失業率","景気が良くても存在する失業率",""],
+["雇用","フィリップス曲線","失業率とインフレ率の関係",""],
+["景気","景気循環","景気拡大と後退が繰り返されること",""],
+["景気","景気拡張","経済活動が拡大する局面",""],
+["景気","景気後退","経済活動が縮小する局面",""],
+["景気","景気の山","景気拡張のピーク",""],
+["景気","景気の谷","景気後退の底",""],
+["景気","先行系列","景気に先行して動く経済指標",""],
+["景気","一致系列","景気とほぼ同時に動く指標",""],
+["景気","遅行系列","景気に遅れて動く指標",""],
+["国際","為替レート","2国間の通貨交換比率",""],
+["国際","円高","円の価値が上昇すること",""],
+["国際","円安","円の価値が低下すること",""],
+["国際","固定相場制","為替レートを一定水準に維持する制度",""],
+["国際","変動相場制","市場の需要・供給によって為替が決まる制度",""],
+["成長","労働生産性","労働1単位当たりの生産量","労働生産性＝GDP/労働投入量"],
+["成長","経済成長率","GDPなどの増加率","(今年GDP−前年GDP)/前年GDP×100"]
+].map((t,i)=>({id:"t"+i, cat:t[0], term:t[1], desc:t[2], formula:t[3]}));
+
+let progress = {}; // id -> 0(未) 1(あいまい) 2(理解)
+let order = [];
+let idx = 0;
+let flipped = false;
+let filterCat = "all";
+let view = "study"; // "study" | "history"
+let historyRows = [];
+let historyLoading = false;
+let lastSyncOk = null; // null=未送信 true=成功 false=失敗
+
+const KEY = "econ_progress_v1";
+const LEVEL_LABEL = {0:"未理解",1:"あいまい",2:"理解済"};
+
+async function sendToSheet(cur, lv){
+  try{
+    await fetch(GAS_URL, {
+      method:"POST",
+      mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify({
+        timestamp: new Date().toLocaleString("ja-JP"),
+        no: cur.id.replace("t",""),
+        category: cur.cat,
+        term: cur.term,
+        level: LEVEL_LABEL[lv]
+      })
+    });
+    lastSyncOk = true;
+  }catch(e){
+    lastSyncOk = false;
+  }
+}
+
+async function loadHistory(){
+  historyLoading = true;
+  render();
+  try{
+    const res = await fetch(GAS_URL, {method:"GET"});
+    const data = await res.json();
+    historyRows = data.reverse(); // 新しい順
+  }catch(e){
+    historyRows = null; // 読み込み失敗の目印
+  }
+  historyLoading = false;
+  render();
+}
+
+async function loadProgress(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw) progress = JSON.parse(raw);
+  }catch(e){ progress = {}; }
+}
+async function saveProgress(){
+  try{ localStorage.setItem(KEY, JSON.stringify(progress)); }catch(e){}
+}
+
+function buildOrder(){
+  order = TERMS.filter(t=> filterCat==="all" || t.cat===filterCat).map(t=>t.id);
+  idx = 0;
+  flipped = false;
+}
+
+function shuffleOrder(){
+  for(let i=order.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [order[i],order[j]]=[order[j],order[i]];
+  }
+  idx = 0; flipped=false;
+}
+
+function levelCounts(){
+  let c = {0:0,1:0,2:0,new:0};
+  TERMS.forEach(t=>{
+    const p = progress[t.id];
+    if(p===undefined) c.new++;
+    else c[p]++;
+  });
+  return c;
+}
+
+function categories(){
+  return ["all", ...Array.from(new Set(TERMS.map(t=>t.cat)))];
+}
+
+function renderTabs(){
+  return `
+    <div class="tabs">
+      <button class="tabbtn ${view==='study'?'active':''}" id="tabStudy">📇 学習</button>
+      <button class="tabbtn ${view==='history'?'active':''}" id="tabHistory">📜 履歴（スプレッドシート）</button>
+    </div>
+  `;
+}
+
+function attachTabHandlers(){
+  document.getElementById("tabStudy").onclick = ()=>{ view="study"; render(); };
+  document.getElementById("tabHistory").onclick = ()=>{
+    view="history";
+    if(historyRows.length===0) loadHistory(); else render();
+  };
+}
+
+function renderHistoryView(){
+  const app = document.getElementById("app");
+  let body;
+  if(historyLoading){
+    body = `<div class="loading">読み込み中...</div>`;
+  } else if(historyRows===null){
+    body = `<div class="loading">履歴の取得に失敗しました。スプレッドシートのApps Script設定をご確認ください。</div>`;
+  } else if(historyRows.length===0){
+    body = `<div class="loading">まだ記録がありません。学習タブで評価すると、ここに記録が積み重なります。</div>`;
+  } else {
+    const rows = historyRows.map(r=>{
+      const cls = r.level==="理解済"?"b-ok":r.level==="あいまい"?"b-mid":"b-ng";
+      return `<tr>
+        <td>${r.timestamp}</td>
+        <td>${r.category}</td>
+        <td>${r.term}</td>
+        <td><span class="lvpill ${cls}">${r.level}</span></td>
+      </tr>`;
+    }).join("");
+    body = `
+      <div class="histwrap">
+        <table class="hist">
+          <thead><tr><th>日時</th><th>分野</th><th>用語</th><th>理解度</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+  app.innerHTML = `
+    ${renderTabs()}
+    <div class="controls" style="margin-bottom:10px;">
+      <button class="navbtn" id="refreshBtn" style="flex:none;padding:6px 14px;">🔄 最新の記録を取得</button>
+    </div>
+    ${body}
+  `;
+  attachTabHandlers();
+  const rb = document.getElementById("refreshBtn");
+  if(rb) rb.onclick = loadHistory;
+}
+
+function render(){
+  if(view==="history"){ renderHistoryView(); return; }
+  const app = document.getElementById("app");
+  if(order.length===0){
+    app.innerHTML = `${renderTabs()}<div class="loading">このカテゴリーには用語がありません</div>`;
+    attachTabHandlers();
+    return;
+  }
+  const cur = TERMS.find(t=>t.id===order[idx]);
+  const p = progress[cur.id];
+  const badgeClass = p===undefined? "b-new" : p===0? "b-ng" : p===1? "b-mid":"b-ok";
+  const badgeText = p===undefined? "未学習" : p===0? "未理解" : p===1? "あいまい":"理解済";
+  const counts = levelCounts();
+  const total = TERMS.length;
+  const doneRatio = Math.round(((counts[2])/total)*100);
+
+  const syncTag = lastSyncOk===null ? "" :
+    lastSyncOk ? `<span class="synctag sync-ok">✅ シート同期済</span>` :
+    `<span class="synctag sync-off">⚠️ 同期失敗</span>`;
+
+  app.innerHTML = `
+    ${renderTabs()}
+    <div class="stats">
+      <div class="stat"><span class="dot" style="background:var(--ng)"></span>未理解 ${counts[0]}</div>
+      <div class="stat"><span class="dot" style="background:var(--mid)"></span>あいまい ${counts[1]}</div>
+      <div class="stat"><span class="dot" style="background:var(--ok)"></span>理解済 ${counts[2]}</div>
+      <div class="stat"><span class="dot" style="background:#334155"></span>未学習 ${counts.new}</div>
+      ${syncTag}
+    </div>
+    <div class="progressbar"><div class="progressfill" style="width:${doneRatio}%"></div></div>
+    <div class="controls">
+      <select id="catSelect"></select>
+      <select id="modeSelect">
+        <option value="all">全て表示</option>
+        <option value="review">要復習(未理解+あいまい)のみ</option>
+      </select>
+      <button class="navbtn" id="shuffleBtn" style="flex:none;padding:6px 14px;">🔀 シャッフル</button>
+    </div>
+    <div class="card" id="card">
+      <div class="cat">${cur.cat}</div>
+      <div class="badge ${badgeClass}">${badgeText}</div>
+      ${!flipped ? `
+        <div class="term">${cur.term}</div>
+        <div class="hint">タップして意味を表示 (${idx+1}/${order.length})</div>
+      ` : `
+        <div class="term" style="font-size:1.2rem;">${cur.term}</div>
+        <div class="desc">${cur.desc}</div>
+        ${cur.formula ? `<div class="formula">${cur.formula}</div>` : ""}
+      `}
+    </div>
+    ${flipped ? `
+    <div class="rate-row">
+      <button class="rate-btn rate-ng" data-lv="0">😵 未理解</button>
+      <button class="rate-btn rate-mid" data-lv="1">😐 あいまい</button>
+      <button class="rate-btn rate-ok" data-lv="2">😎 理解済</button>
+    </div>` : ""}
+    <div class="navrow">
+      <button class="navbtn" id="prevBtn">← 前へ</button>
+      <button class="navbtn" id="nextBtn">次へ →</button>
+    </div>
+    <div class="footer">全${total}語 / 表示中 ${order.length}語 ・ 進捗は自動保存されます</div>
+  `;
+
+  attachTabHandlers();
+  const catSelect = document.getElementById("catSelect");
+  categories().forEach(c=>{
+    const o = document.createElement("option");
+    o.value=c; o.textContent = c==="all" ? "全カテゴリー" : c;
+    if(c===filterCat) o.selected=true;
+    catSelect.appendChild(o);
+  });
+  catSelect.onchange = ()=>{ filterCat = catSelect.value; buildOrder(); render(); };
+
+  document.getElementById("modeSelect").onchange = (e)=>{
+    if(e.target.value==="review"){
+      order = TERMS.filter(t=>{
+        if(filterCat!=="all" && t.cat!==filterCat) return false;
+        const p = progress[t.id];
+        return p===undefined || p===0 || p===1;
+      }).map(t=>t.id);
+    } else {
+      buildOrder();
+    }
+    idx=0; flipped=false; render();
+  };
+
+  document.getElementById("shuffleBtn").onclick = ()=>{ shuffleOrder(); render(); };
+  document.getElementById("card").onclick = ()=>{ flipped=!flipped; render(); };
+  document.getElementById("prevBtn").onclick = ()=>{ idx=(idx-1+order.length)%order.length; flipped=false; render(); };
+  document.getElementById("nextBtn").onclick = ()=>{ idx=(idx+1)%order.length; flipped=false; render(); };
+
+  document.querySelectorAll(".rate-btn").forEach(b=>{
+    b.onclick = async (e)=>{
+      e.stopPropagation();
+      const lv = parseInt(b.dataset.lv);
+      progress[cur.id] = lv;
+      await saveProgress();
+      sendToSheet(cur, lv); // 非同期でスプレッドシートへ送信（結果を待たず進む）
+      idx=(idx+1)%order.length; flipped=false; render();
+    };
+  });
+}
+
+(async function init(){
+  await loadProgress();
+  buildOrder();
+  render();
+})();
+</script>
+</body>
+</html>
